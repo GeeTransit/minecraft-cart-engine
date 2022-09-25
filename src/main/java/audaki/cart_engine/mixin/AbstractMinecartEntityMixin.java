@@ -52,7 +52,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
      */
     @Overwrite
     public void moveOnRail(BlockPos pos, BlockState state) {
-        this.onLanding();
+        this.fallDistance = 0.0F;
         double d = this.getX();
         double e = this.getY();
         double f = this.getZ();
