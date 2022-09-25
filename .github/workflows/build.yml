@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         java: [
-          17 # JavaVersion from Gradle
+          16 # JavaVersion from Gradle
         ]
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}

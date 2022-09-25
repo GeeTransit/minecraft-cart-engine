@@ -2,8 +2,8 @@ plugins {
 	id 'fabric-loom' version '1.0-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = "${project.archives_base_name}--fabric-mc${project.minecraft_version}-"
 version = project.mod_version
@@ -26,7 +26,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
-	it.options.release = 17
+	it.options.release = 16
 }
 
 java {

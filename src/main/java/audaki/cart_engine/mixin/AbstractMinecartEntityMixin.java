@@ -39,7 +39,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
     protected abstract void applySlowdown();
 
     @Shadow
-    protected abstract double getMaxSpeed();
+    protected abstract double getMaxOffRailSpeed();
 
     @Shadow
     private static Pair<Vec3i, Vec3i> getAdjacentRailPositionsByShape(RailShape shape) {
@@ -112,7 +112,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
 
         Supplier<Double> calculateMaxHorizontalMovementPerTick = () -> {
             final double fallbackSpeedFactor = 1.15D;
-            double fallback = this.getMaxSpeed();
+            double fallback = this.getMaxOffRailSpeed();
 
             if (!this.hasPassengers())
                 return fallback;
