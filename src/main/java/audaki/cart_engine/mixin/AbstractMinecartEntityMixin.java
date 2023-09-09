@@ -60,6 +60,17 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
         return state.isOf(Blocks.RAIL) || (state.isOf(Blocks.POWERED_RAIL) && state.get(PoweredRailBlock.POWERED));
     }
 
+    private static int forwardTrackLimitOf(BlockState groundState) {
+        if (groundState.isOf(Blocks.GRAVEL)) {
+            return 16;
+        } else if (groundState.isOf(Blocks.COBBLESTONE)) {
+            // TODO: maybe allow blackstone, deepslate, bricks, netherbricks
+            return 8;
+        } else {
+            return 4;
+        }
+    }
+
     private static RailShape getRailShape(BlockState state) {
         if (!(state.getBlock() instanceof AbstractRailBlock railBlock))
             throw new IllegalArgumentException("No rail shape found");
@@ -174,6 +185,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
                 return fallback;
 
             AtomicInteger eligibleNeighbors = new AtomicInteger();
+            AtomicInteger bufferDistance = new AtomicInteger(forwardTrackLimitOf(this.world.getBlockState(pos.down())));
 
             HashSet<BlockPos> checkedPositions = new HashSet<>();
             checkedPositions.add(pos);
@@ -199,6 +211,9 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
                     if (nborShape != railShape)
                         return new ArrayList<>();
 
+                    int maxBufferDistance = forwardTrackLimitOf(this.world.getBlockState(nborPos.down()));
+                    bufferDistance.updateAndGet(dist -> dist > maxBufferDistance ? dist : maxBufferDistance);
+
                     checkedPositions.add(nborPos);
                     eligibleNeighbors.incrementAndGet();
                     // Adding the neighbor rail shape currently has no use, since we abort on rail shape change anyway
@@ -206,13 +221,16 @@ public abstract class AbstractMinecartEntityMixin extends Entity {
                     newNeighbors.add(Pair.of(nborPos, nborShape));
                 }
 
+                if (bufferDistance.getAndDecrement() <= 0)
+                    return new ArrayList<>();
+
                 return newNeighbors;
             };
 
 
             ArrayList<Pair<BlockPos, RailShape>> newNeighbors = checkNeighbors.apply(pos, railShape);
 
-            while (!newNeighbors.isEmpty() && eligibleNeighbors.get() < 16) {
+            while (!newNeighbors.isEmpty() && eligibleNeighbors.get() < 32) {
                 ArrayList<Pair<BlockPos, RailShape>> tempNewNeighbors = new ArrayList<>(newNeighbors);
                 newNeighbors.clear();
 
